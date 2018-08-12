@@ -1,8 +1,8 @@
 /*====
 Cloudwatch Log Group
 ======*/
-resource "aws_cloudwatch_log_group" "openjobs" {
-  name = "openjobs"
+resource "aws_cloudwatch_log_group" "phptesttest" {
+  name = "phptesttest"
 
   tags {
     Environment = "${var.environment}"
@@ -13,7 +13,7 @@ resource "aws_cloudwatch_log_group" "openjobs" {
 /*====
 ECR repository to store our Docker images
 ======*/
-resource "aws_ecr_repository" "openjobs_app" {
+resource "aws_ecr_repository" "phptesttest_app" {
   name = "${var.repository_name}"
 }
 
@@ -33,10 +33,10 @@ data "template_file" "web_task" {
   template = "${file("${path.module}/tasks/web_task_definition.json")}"
 
   vars {
-    image           = "${aws_ecr_repository.openjobs_app.repository_url}"
+    image           = "${aws_ecr_repository.phptesttest_app.repository_url}"
     secret_key_base = "${var.secret_key_base}"
     database_url    = "postgresql://${var.database_username}:${var.database_password}@${var.database_endpoint}:5432/${var.database_name}?encoding=utf8&pool=40"
-    log_group       = "${aws_cloudwatch_log_group.openjobs.name}"
+    log_group       = "${aws_cloudwatch_log_group.phptesttest.name}"
   }
 }
 
@@ -45,8 +45,8 @@ resource "aws_ecs_task_definition" "web" {
   container_definitions    = "${data.template_file.web_task.rendered}"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "512"
+  memory                   = "1024"
   execution_role_arn       = "${aws_iam_role.ecs_execution_role.arn}"
   task_role_arn            = "${aws_iam_role.ecs_execution_role.arn}"
 }
@@ -56,10 +56,10 @@ data "template_file" "db_migrate_task" {
   template = "${file("${path.module}/tasks/db_migrate_task_definition.json")}"
 
   vars {
-    image           = "${aws_ecr_repository.openjobs_app.repository_url}"
+    image           = "${aws_ecr_repository.phptesttest_app.repository_url}"
     secret_key_base = "${var.secret_key_base}"
     database_url    = "postgresql://${var.database_username}:${var.database_password}@${var.database_endpoint}:5432/${var.database_name}?encoding=utf8&pool=40"
-    log_group       = "openjobs"
+    log_group       = "phptesttest"
   }
 }
 
@@ -125,19 +125,19 @@ resource "aws_security_group" "web_inbound_sg" {
   }
 }
 
-resource "aws_alb" "alb_openjobs" {
-  name            = "${var.environment}-alb-openjobs"
+resource "aws_alb" "alb_phptesttest" {
+  name            = "${var.environment}-alb-phptesttest"
   subnets         = ["${var.public_subnet_ids}"]
   security_groups = ["${var.security_groups_ids}", "${aws_security_group.web_inbound_sg.id}"]
 
   tags {
-    Name        = "${var.environment}-alb-openjobs"
+    Name        = "${var.environment}-alb-phptesttest"
     Environment = "${var.environment}"
   }
 }
 
-resource "aws_alb_listener" "openjobs" {
-  load_balancer_arn = "${aws_alb.alb_openjobs.arn}"
+resource "aws_alb_listener" "phptesttest" {
+  load_balancer_arn = "${aws_alb.alb_phptesttest.arn}"
   port              = "80"
   protocol          = "HTTP"
   depends_on        = ["aws_alb_target_group.alb_target_group"]
@@ -232,6 +232,7 @@ resource "aws_security_group" "ecs_service" {
 
 /* Simply specify the family to find the latest ACTIVE revision in that family */
 data "aws_ecs_task_definition" "web" {
+  depends_on      = ["aws_ecs_task_definition.web"]
   task_definition = "${aws_ecs_task_definition.web.family}"
 }
 
@@ -239,6 +240,7 @@ resource "aws_ecs_service" "web" {
   name            = "${var.environment}-web"
   task_definition = "${aws_ecs_task_definition.web.family}:${max("${aws_ecs_task_definition.web.revision}", "${data.aws_ecs_task_definition.web.revision}")}"
   desired_count   = 2
+  health_check_grace_period_seconds = 0
   launch_type     = "FARGATE"
   cluster =       "${aws_ecs_cluster.cluster.id}"
   depends_on      = ["aws_iam_role_policy.ecs_service_role_policy"]
@@ -277,8 +279,8 @@ resource "aws_appautoscaling_target" "target" {
   resource_id        = "service/${aws_ecs_cluster.cluster.name}/${aws_ecs_service.web.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   role_arn           = "${aws_iam_role.ecs_autoscale_role.arn}"
-  min_capacity       = 2
-  max_capacity       = 4
+  min_capacity       = 4
+  max_capacity       = 32
 }
 
 resource "aws_appautoscaling_policy" "up" {
@@ -295,7 +297,7 @@ resource "aws_appautoscaling_policy" "up" {
 
     step_adjustment {
       metric_interval_lower_bound = 0
-      scaling_adjustment = 1
+      scaling_adjustment = 8
     }
   }
 
@@ -315,7 +317,7 @@ resource "aws_appautoscaling_policy" "down" {
 
     step_adjustment {
       metric_interval_lower_bound = 0
-      scaling_adjustment = -1
+      scaling_adjustment = -2
     }
   }
 
@@ -324,14 +326,14 @@ resource "aws_appautoscaling_policy" "down" {
 
 /* metric used for auto scale */
 resource "aws_cloudwatch_metric_alarm" "service_cpu_high" {
-  alarm_name          = "${var.environment}_openjobs_web_cpu_utilization_high"
+  alarm_name          = "${var.environment}_phptesttest_web_cpu_utilization_high"
   comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods  = "1"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/ECS"
   period              = "60"
   statistic           = "Maximum"
-  threshold           = "85"
+  threshold           = "50"
 
   dimensions {
     ClusterName = "${aws_ecs_cluster.cluster.name}"

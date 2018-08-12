@@ -2,12 +2,11 @@
 Variables used across all modules
 ======*/
 locals {
-  production_availability_zones = ["us-east-1a", "us-east-1b"]
+  production_availability_zones = ["eu-west-1a", "eu-west-1b"]
 }
 
 provider "aws" {
   region  = "${var.region}"
-  #profile = "duduribeiro"
 }
 
 resource "aws_key_pair" "key" {
@@ -43,7 +42,7 @@ module "ecs" {
   environment         = "production"
   vpc_id              = "${module.networking.vpc_id}"
   availability_zones  = "${local.production_availability_zones}"
-  repository_name     = "openjobs/production"
+  repository_name     = "phptesttest/production"
   subnets_ids         = ["${module.networking.private_subnets_id}"]
   public_subnet_ids   = ["${module.networking.public_subnets_id}"]
   security_groups_ids = [

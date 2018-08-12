@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "source" {
-  bucket        = "openjobs-experiment-source"
+  bucket        = "phptesttest-experiment-source"
   acl           = "private"
   force_destroy = true
 }
@@ -25,9 +25,7 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
   policy = "${data.template_file.codepipeline_policy.rendered}"
 }
 
-/*
-/* CodeBuild
-*/
+/* CodeBuild */
 resource "aws_iam_role" "codebuild_role" {
   name               = "codebuild-role"
   assume_role_policy = "${file("${path.module}/policies/codebuild_role.json")}"
@@ -60,8 +58,8 @@ data "template_file" "buildspec" {
 }
 
 
-resource "aws_codebuild_project" "openjobs_build" {
-  name          = "openjobs-codebuild"
+resource "aws_codebuild_project" "phptesttest_build" {
+  name          = "phptesttest-codebuild"
   build_timeout = "10"
   service_role  = "${aws_iam_role.codebuild_role.arn}"
 
@@ -86,7 +84,7 @@ resource "aws_codebuild_project" "openjobs_build" {
 /* CodePipeline */
 
 resource "aws_codepipeline" "pipeline" {
-  name     = "openjobs-pipeline"
+  name     = "phptesttest-pipeline"
   role_arn = "${aws_iam_role.codepipeline_role.arn}"
 
   artifact_store {
@@ -106,8 +104,8 @@ resource "aws_codepipeline" "pipeline" {
       output_artifacts = ["source"]
 
       configuration {
-        Owner      = "duduribeiro"
-        Repo       = "openjobs_experiment"
+        Owner      = "phptest-boag"
+        Repo       = "phptesttest_experiment"
         Branch     = "master"
       }
     }
@@ -126,7 +124,7 @@ resource "aws_codepipeline" "pipeline" {
       output_artifacts = ["imagedefinitions"]
 
       configuration {
-        ProjectName = "openjobs-codebuild"
+        ProjectName = "phptesttest-codebuild"
       }
     }
   }

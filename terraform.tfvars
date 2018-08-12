@@ -1,9 +1,10 @@
-region                        = "us-east-1"
-domain                        = "ecsfargateexample.tk"
+region                        = "eu-west-1"
+domain                        = "phptestboag.co.uk"
+alb_dns_name									= "Yolo"
 
 /* rds */
-production_database_name      = "openjobs_production"
-production_database_username  = "openjobs"
+production_database_name      = "phptesttest_production"
+production_database_username  = "phptesttest"
 production_database_password  = "myawesomepasswordproduction"
 
 /* secret key */

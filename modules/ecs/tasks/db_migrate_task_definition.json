@@ -8,13 +8,13 @@
       "logDriver": "awslogs",
       "options": {
         "awslogs-group": "${log_group}",
-        "awslogs-region": "us-east-1",
+        "awslogs-region": "eu-west-1",
         "awslogs-stream-prefix": "db_migrate"
       }
     },
     "environment": [
       {
-        "name": "RAILS_ENV",
+        "name": "APPLICATION_ENV",
         "value": "production"
       },
       {
@@ -24,10 +24,6 @@
       {
         "name": "SECRET_KEY_BASE",
         "value": "${secret_key_base}"
-      },
-      {
-        "name": "RAILS_LOG_TO_STDOUT",
-        "value": "true"
       }
     ]
   }

@@ -1,4 +1,3 @@
-
 module "code_pipeline" {
   source                      = "./modules/code_pipeline"
   repository_url              = "${module.ecs.repository_url}"
