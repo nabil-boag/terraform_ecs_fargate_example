@@ -1,7 +1,7 @@
 
 # You need to have a Github repository set up with 
 
-`projectname_experiment`
+`nabils-cpu-test`
 
 # Terraform ECS Example Hello world
 

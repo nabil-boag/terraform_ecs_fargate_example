@@ -1,10 +1,9 @@
 region                        = "eu-west-1"
-domain                        = "phptestboag.co.uk"
-alb_dns_name									= "Yolo"
+domain                        = "nabilboag.co.uk"
 
 /* rds */
-production_database_name      = "phptesttest_production"
-production_database_username  = "phptesttest"
+production_database_name      = "nabilscputesttest_production"
+production_database_username  = "nabilscputesttest"
 production_database_password  = "myawesomepasswordproduction"
 
 /* secret key */

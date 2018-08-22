@@ -1,5 +1,5 @@
 output "repository_url" {
-  value = "${aws_ecr_repository.phptesttest_app.repository_url}"
+  value = "${aws_ecr_repository.nabilscputesttest_app.repository_url}"
 }
 
 output "cluster_name" {
@@ -11,11 +11,11 @@ output "service_name" {
 }
 
 output "alb_dns_name" {
-  value = "${aws_alb.alb_phptesttest.dns_name}"
+  value = "${aws_alb.alb_nabilscputesttest.dns_name}"
 }
 
 output "alb_zone_id" {
-  value = "${aws_alb.alb_phptesttest.zone_id}"
+  value = "${aws_alb.alb_nabilscputesttest.zone_id}"
 }
 
 output "security_group_id" {

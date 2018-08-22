@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "source" {
-  bucket        = "phptesttest-experiment-source"
+  bucket        = "nabils-cpu-test-experiment-source"
   acl           = "private"
   force_destroy = true
 }
@@ -58,8 +58,8 @@ data "template_file" "buildspec" {
 }
 
 
-resource "aws_codebuild_project" "phptesttest_build" {
-  name          = "phptesttest-codebuild"
+resource "aws_codebuild_project" "nabils-cpu-test_build" {
+  name          = "nabils-cpu-test-codebuild"
   build_timeout = "10"
   service_role  = "${aws_iam_role.codebuild_role.arn}"
 
@@ -84,7 +84,7 @@ resource "aws_codebuild_project" "phptesttest_build" {
 /* CodePipeline */
 
 resource "aws_codepipeline" "pipeline" {
-  name     = "phptesttest-pipeline"
+  name     = "nabils-cpu-test-pipeline"
   role_arn = "${aws_iam_role.codepipeline_role.arn}"
 
   artifact_store {
@@ -104,8 +104,8 @@ resource "aws_codepipeline" "pipeline" {
       output_artifacts = ["source"]
 
       configuration {
-        Owner      = "phptest-boag"
-        Repo       = "phptesttest_experiment"
+        Owner      = "nabil-boag"
+        Repo       = "dotnet-cpu-test"
         Branch     = "master"
       }
     }
@@ -124,7 +124,7 @@ resource "aws_codepipeline" "pipeline" {
       output_artifacts = ["imagedefinitions"]
 
       configuration {
-        ProjectName = "phptesttest-codebuild"
+        ProjectName = "nabils-cpu-test-codebuild"
       }
     }
   }
