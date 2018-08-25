@@ -6,6 +6,14 @@ variable "region" {
   description = "The region to use"
 }
 
+variable "github_user" {
+  description = "The username of the Github account"
+}
+
+variable "github_repo" {
+  description = "The Github repository name"
+}
+
 variable "ecs_cluster_name" {
   description = "The cluster that we will deploy"
 }

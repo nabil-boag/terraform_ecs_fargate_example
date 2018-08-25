@@ -104,8 +104,8 @@ resource "aws_codepipeline" "pipeline" {
       output_artifacts = ["source"]
 
       configuration {
-        Owner      = "nabil-boag"
-        Repo       = "dotnet-cpu-test"
+        Owner      = "${var.github_user}"
+        Repo       = "${var.github_repo}"
         Branch     = "master"
       }
     }
